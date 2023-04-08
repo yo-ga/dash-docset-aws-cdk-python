@@ -11,7 +11,8 @@ unzip ../doc.zip -d ../export
 echo ./static/specific.css >> ../export/_static/css/custom.css
 
 pip3 install -r requirements.txt
-doc2dash -n "AWS_CDK_Python" -I index.html -j -u "https://docs.aws.amazon.com/cdk/api/v2/python/" ../export
+doc2dash -n "AWS CDK Python" -I index.html -j -u "https://docs.aws.amazon.com/cdk/api/v2/python/" ../export
+mv ./AWS\ CDK\ Python.docset/ ./AWS_CDK_Python.docset/
 cp ./static/icon.png ./AWS_CDK_Python.docset/
 cp ./static/icon@2x.png ./AWS_CDK_Python.docset/
 ls .
