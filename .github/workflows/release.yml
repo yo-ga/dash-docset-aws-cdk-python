@@ -3,8 +3,7 @@ name: Build release docset
 on:
   schedule:
     - cron: '0 10 * * *'
-  pull_request:
-    branches: [ "master" ]
+  workflow_dispatch: {}
 
 jobs:
   check:
@@ -45,6 +44,8 @@ jobs:
       - check
       - docset
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - uses: actions/download-artifact@v3
