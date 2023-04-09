@@ -3,6 +3,10 @@ name: Build docset
 on:
   pull_request:
     branches: [ "master" ]
+  workflow_call:
+    outputs:
+      run_id:
+        value: ${{ github.run_id }}
 
 jobs:
   build:
