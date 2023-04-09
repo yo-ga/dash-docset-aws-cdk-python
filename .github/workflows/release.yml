@@ -18,6 +18,10 @@ jobs:
           cdkTag=$(gh release view --repo aws/aws-cdk --json tagName | jq -r .tagName)
           echo "cdk=$cdkTag" >> $GITHUB_OUTPUT
           lastestTag=$(gh release view --repo $GITHUB_REPOSITORY --json tagName | jq -r .tagName)
+
+          echo "CDK: $cdkTag"
+          echo "This repo: $lastestTag"
+
           if [[ "$cdkTag" != "$lastestTag" ]]
           then
             echo "proceed=true" >> $GITHUB_OUTPUT
@@ -36,3 +40,23 @@ jobs:
     if: ${{ needs.check.outputs.proceed == 'true' }}
     uses: ./.github/workflows/build.yml
 
+  release:
+    needs:
+      - check
+      - docset
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: AWS_CDK_Python.tgz
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CDK_VERSION: ${{ needs.check.outputs.cdk-version }}
+        run: |
+          gh release create $CDK_VERSION ./AWS_CDK_Python.tgz \
+            --repo=$GITHUB_REPOSITORY \
+            --notes="Release with aws/aws-cdk@$CDK_VERSION" \
+            --title=$CDK_VERSION \
+            --latest
