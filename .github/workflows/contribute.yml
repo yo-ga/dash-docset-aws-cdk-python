@@ -1,0 +1,14 @@
+name: Contribute
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        type: string
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo test

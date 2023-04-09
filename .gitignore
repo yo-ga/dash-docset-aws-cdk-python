@@ -1,0 +1,3 @@
+*.tgz
+*.docset/
+.venv/
