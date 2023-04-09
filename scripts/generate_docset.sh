@@ -16,3 +16,5 @@ mv ./AWS\ CDK\ Python.docset/ ./AWS_CDK_Python.docset/
 cp ./static/icon.png ./AWS_CDK_Python.docset/
 cp ./static/icon@2x.png ./AWS_CDK_Python.docset/
 ls .
+
+tar --exclude='.DS_Store' -cvzf AWS_CDK_Python.tgz AWS_CDK_Python.docset

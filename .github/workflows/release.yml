@@ -1,0 +1,38 @@
+name: Build release docset
+
+on:
+  schedule:
+    - cron: '0 10 * * *'
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - id: compare
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cdkTag=$(gh release view --repo aws/aws-cdk --json tagName | jq -r .tagName)
+          echo "cdk=$cdkTag" >> $GITHUB_OUTPUT
+          lastestTag=$(gh release view --repo $GITHUB_REPOSITORY --json tagName | jq -r .tagName)
+          if [[ "$cdkTag" != "$lastestTag" ]]
+          then
+            echo "proceed=true" >> $GITHUB_OUTPUT
+            exit 0
+          else
+            echo "proceed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+    outputs:
+      proceed: ${{ steps.compare.outputs.proceed }}
+      cdk-version: ${{ steps.compare.outputs.cdk }}
+
+  docset:
+    needs: check
+    if: ${{ needs.check.outputs.proceed == 'true' }}
+    uses: ./.github/workflows/build.yml
+

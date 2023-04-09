@@ -13,3 +13,8 @@ jobs:
 
       - name: run script
         run: bash ./scripts/generate_docset.sh
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: AWS_CDK_Python.tgz
+          path: AWS_CDK_Python.tgz
