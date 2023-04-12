@@ -3,6 +3,9 @@ name: Build release docset
 on:
   schedule:
     - cron: '20 10 * * *'
+  push:
+    branches:
+      - master
   workflow_dispatch: {}
 
 jobs:
@@ -21,7 +24,7 @@ jobs:
           echo "CDK: $cdkTag"
           echo "This repo: $lastestTag"
 
-          if [[ "$cdkTag" != "$lastestTag" ]]
+          if [[ "$cdkTag" != "${lastestTag%-*}" ]]
           then
             echo "proceed=true" >> $GITHUB_OUTPUT
             exit 0
@@ -59,5 +62,5 @@ jobs:
           gh release create $CDK_VERSION ./AWS_CDK_Python.tgz \
             --repo=$GITHUB_REPOSITORY \
             --notes="Release with aws/aws-cdk@$CDK_VERSION" \
-            --title=$CDK_VERSION \
+            --title=$CDK_VERSION-`date +%s` \
             --latest
