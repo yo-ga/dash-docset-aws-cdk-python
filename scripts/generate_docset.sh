@@ -7,7 +7,7 @@ wget "https://github.com/aws/aws-cdk/releases/download/${tag}/aws-cdk-python-doc
 mkdir ../export
 unzip ../doc.zip -d ../export
 
-find ../export/**/*.html -type f | xargs sed -i '' '/awsdocs-boot.js/d'
+find ../export/**/*.html -type f | xargs sed -i '/awsdocs-boot.js/d'
 cat ./static/specific.css >> ../export/_static/css/custom.css
 
 pip3 install -r requirements.txt
