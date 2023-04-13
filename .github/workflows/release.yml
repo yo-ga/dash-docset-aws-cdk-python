@@ -65,7 +65,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           CDK_VERSION: ${{ needs.check.outputs.cdk-version }}
         run: |
-          gh release create $CDK_VERSION ./AWS_CDK_Python.tgz \
+          gh release create "$CDK_VERSION-$(date +%s)" ./AWS_CDK_Python.tgz \
             --repo=$GITHUB_REPOSITORY \
             --notes="Release with aws/aws-cdk@$CDK_VERSION" \
             --title=$CDK_VERSION-`date +%s` \
