@@ -9,6 +9,50 @@ on:
 jobs:
   push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
+      - name: Get release version
+        run: |
+          version=$(gh release view --repo $GITHUB_REPOSITORY --json tagName | jq -r .tagName)
+          echo "Contribute release version: $version"
+          echo RELEASE_VERSION=$version >> $GITHUB_ENV
+
+      - name: Download asset
+        run: |
+          gh release download ${RELEASE_VERSION} -R $GITHUB_REPOSITORY -D /tmp -p AWS_CDK_Python.tgz
+
+      - name: Sync repo
+        run: |
+          gh repo sync yo-ga/Dash-User-Contributions --source Kapari/Dash-User-Contributions -b master
+      
+      - uses: actions/checkout@v3
+        with:
+          repository: yo-ga/Dash-User-Contributions
+          persist-credentials: true
+          fetch-depth: 0
+
       - run: |
-          echo test
+          git checkout -b aws-cdk-python-${RELEASE_VERSION}
+
+      - run: |
+          mkdir -p ./docsets/AWS_CDK_Python/versions/${RELEASE_VERSION}
+          cp /tmp/AWS_CDK_Python.tgz ./docsets/AWS_CDK_Python/
+          cp /tmp/AWS_CDK_Python.tgz ./docsets/AWS_CDK_Python/versions/${RELEASE_VERSION}
+
+      - run: |
+          cat docsets/AWS_CDK_Python/docset.json | jq --indent=4 -M '.specific_versions += [{"version": "${RELEASE_VERSION/-/\/}", "archive": "versions/${RELEASE_VERSION}/AWS_CDK_Python.tgz"}] | .specific_versions |= (sort_by(.version) | reverse) | .version |= "${RELEASE_VERSION/-/\/}"' > docsets/AWS_CDK_Python/docset.json
+
+      - run: |
+          git add .
+          git commit -m "AWS-CDK-Python: ${RELEASE_VERSION}"
+          git push origin aws-cdk-python-${RELEASE_VERSION}
+
+      - run: |
+          gh pr create --repo=yo-ga/Dash-User-Contributions \
+          --base=master \
+          --head="${GITHUB_OWNER}:aws-cdk-python-${RELEASE_VERSION}" \
+          --title="AWS-CDK-Python ${RELEASE_VERSION}" \
+          --body="- Document: AWS CDK Python\n- Latest version: ${RELEASE_VERSION}\n- Generated from: [yo-ga/dash-docset-aws-cdk-python](https://github.com/yo-ga/dash-docset-aws-cdk-python/)\n- Change log\n    - Release ${RELEASE_VERSION}"
