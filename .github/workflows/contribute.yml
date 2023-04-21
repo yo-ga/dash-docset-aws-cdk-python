@@ -43,7 +43,7 @@ jobs:
           cp /tmp/AWS_CDK_Python.tgz ./docsets/AWS_CDK_Python/versions/${RELEASE_VERSION}
 
       - run: |
-          cat docsets/AWS_CDK_Python/docset.json | jq --indent=4 -M '.specific_versions += [{"version": "${RELEASE_VERSION/-/\/}", "archive": "versions/${RELEASE_VERSION}/AWS_CDK_Python.tgz"}] | .specific_versions |= (sort_by(.version) | reverse) | .version |= "${RELEASE_VERSION/-/\/}"' > docsets/AWS_CDK_Python/docset.json
+          cat docsets/AWS_CDK_Python/docset.json | jq --indent 4 -M '.specific_versions += [{"version": "${RELEASE_VERSION/-/\/}", "archive": "versions/${RELEASE_VERSION}/AWS_CDK_Python.tgz"}] | .specific_versions |= (sort_by(.version) | reverse) | .version |= "${RELEASE_VERSION/-/\/}"' > docsets/AWS_CDK_Python/docset.json
 
       - run: |
           git add .
