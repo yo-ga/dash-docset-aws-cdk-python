@@ -47,6 +47,8 @@ jobs:
 
       - run: |
           gh auth setup-git
+          git config --global user.email "$(gh api /user/public_emails | jq -r .[0].email)"
+          git config --global user.name "$(gh api /user | jq -r .name)"
           git add .
           git commit -m "AWS-CDK-Python: ${RELEASE_VERSION}"
           git push origin aws-cdk-python-${RELEASE_VERSION}
