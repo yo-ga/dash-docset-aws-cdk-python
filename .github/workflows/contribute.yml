@@ -18,7 +18,7 @@ jobs:
           eval "$(ssh-agent -s)"
           chmod 600 ./ssh_key
           ssh-add ./ssh_key
-          gh auth login -p ssh
+          gh auth login -p ssh -h github.com
       - name: Get release version
         run: |
           version=$(gh release view --repo $GITHUB_REPOSITORY --json tagName | jq -r .tagName)
