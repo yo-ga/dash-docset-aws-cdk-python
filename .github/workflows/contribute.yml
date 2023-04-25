@@ -12,8 +12,14 @@ jobs:
     permissions:
       contents: write
     env:
-      GH_TOKEN: ${{ github.token }}
+      SSH_KEY: ${{ secrets.SSH_KEY }}
     steps:
+      - name: Setup SSH key
+        run: |
+          cat ${SSH_KEY} >> ./ssh_key
+          eval "$(ssh-agent -s)"
+          ssh-add ./ssh_key
+          gh auth login -p ssh
       - name: Get release version
         run: |
           version=$(gh release view --repo $GITHUB_REPOSITORY --json tagName | jq -r .tagName)
