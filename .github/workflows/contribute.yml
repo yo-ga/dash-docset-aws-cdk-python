@@ -11,12 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    env:
-      SSH_KEY: ${{ secrets.SSH_KEY }}
     steps:
       - name: Setup SSH key
         run: |
-          cat "${SSH_KEY}" >> ./ssh_key
+          cat "${{ secrets.SSH_KEY }}" > ./ssh_key
           eval "$(ssh-agent -s)"
           chmod 600 ./ssh_key
           ssh-add ./ssh_key
