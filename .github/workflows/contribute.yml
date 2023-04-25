@@ -18,6 +18,7 @@ jobs:
         run: |
           cat "${SSH_KEY}" >> ./ssh_key
           eval "$(ssh-agent -s)"
+          chmod 600 ./ssh_key
           ssh-add ./ssh_key
           gh auth login -p ssh
       - name: Get release version
