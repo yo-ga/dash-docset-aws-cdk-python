@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Setup SSH key
         run: |
-          cat ${SSH_KEY} >> ./ssh_key
+          cat "${SSH_KEY}" >> ./ssh_key
           eval "$(ssh-agent -s)"
           ssh-add ./ssh_key
           gh auth login -p ssh
