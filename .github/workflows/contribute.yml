@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Setup SSH key
         run: |
-          cat "${{ secrets.SSH_KEY }}" > ./ssh_key
+          echo "${{ secrets.SSH_KEY }}" > ./ssh_key
           eval "$(ssh-agent -s)"
           chmod 600 ./ssh_key
           ssh-add ./ssh_key
