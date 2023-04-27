@@ -17,7 +17,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cdkTag=$(gh release view --repo aws/aws-cdk --json tagName | jq -r .tagName)
+          cdkTag=$(gh api /repos/aws/aws-cdk/git/matching-refs/tags/v2. | jq -r 'sort_by(.version) | reverse | .[0].ref | split("/")[-1]')
           echo "cdk=$cdkTag" >> $GITHUB_OUTPUT
           lastestTag=$(gh release view --repo $GITHUB_REPOSITORY --json tagName | jq -r .tagName)
 
