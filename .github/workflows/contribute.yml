@@ -67,13 +67,13 @@ jobs:
           cp /tmp/AWS_CDK_Python.tgz ./docsets/AWS_CDK_Python/versions/${RELEASE_VERSION}
 
       - run: |
-          cat docsets/AWS_CDK_Python/docset.json | jq --arg RELEASE_VERSION "${RELEASE_VERSION/-//}" --arg DIR "${RELEASE_VERSION}" --indent 4 -M \
+          cat docsets/AWS_CDK_Python/docset.json | jq --arg RELEASE_VERSION "${RELEASE_VERSION/-//}" --arg DIR "versions/${RELEASE_VERSION}/AWS_CDK_Python.tgz" --indent 4 -M \
            '
-           .specific_versions += [{"version": "$RELEASE_VERSION", "archive": "versions/$DIR/AWS_CDK_Python.tgz"}]
+           .specific_versions += [{"version": $RELEASE_VERSION, "archive": $DIR}]
            | .specific_versions
            |= ( sort_by(.version) | reverse )
            | .version
-           |= "$RELEASE_VERSION"' | tee docsets/AWS_CDK_Python/docset.json
+           |= $RELEASE_VERSION' | tee docsets/AWS_CDK_Python/docset.json
 
       - env:
           GH_TOKEN: ${{ steps.setup_token.outputs.token }}
@@ -89,7 +89,7 @@ jobs:
           GH_TOKEN: ${{ steps.setup_token.outputs.token }}
         run: |
           echo -e "- Document: AWS CDK Python\n- Latest version: ${RELEASE_VERSION}\n- Generated from: [${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python](https://github.com/${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python/)\n- Change log\n    - Release ${RELEASE_VERSION}" > msg
-          gh pr create --repo=Kapeli/Dash-User-Contributions \
+          gh pr create --repo=yo-ga/Dash-User-Contributions \
           --base=master \
           --head="${GITHUB_REPOSITORY_OWNER}:aws-cdk-python-${RELEASE_VERSION}" \
           --title="AWS-CDK-Python ${RELEASE_VERSION}" \
