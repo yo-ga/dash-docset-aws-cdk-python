@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Setup token
         id: setup_token
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           echo "${{ secrets.APP_PEM }}" > ./app.pem
           header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 | sed s/\+/-/ | sed -E s/=+$//)
