@@ -25,7 +25,7 @@ jobs:
             | .iat=$time_num
             | .exp=($time_num + 600)
             | .iss="${{ secrets.APP_ID }}"
-            ' | base64 | sed s/\+/-/ | sed -E s/=+$//
+            ' | base64 | sed s/\+/-/ | sed -E s/=+$// | tr -d '\n'
           )
           sign=$(printf '%s' "$header.$payload" | openssl dgst -sha256 -binary -sign ./app.pem  | openssl enc -base64 | tr -d '\n=' | tr -- '+/' '-_')
           jwt="$header.$payload.$sign"
