@@ -31,12 +31,16 @@ jobs:
           echo "token=$token" >> $GITHUB_OUTPUT
 
       - name: Get release version
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           version=$(gh release view --repo $GITHUB_REPOSITORY --json tagName | jq -r .tagName)
           echo "Contribute release version: $version"
           echo RELEASE_VERSION=$version >> $GITHUB_ENV
 
       - name: Download asset
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh release download ${RELEASE_VERSION} -R $GITHUB_REPOSITORY -D /tmp -p AWS_CDK_Python.tgz
 
