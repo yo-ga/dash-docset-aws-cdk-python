@@ -27,7 +27,7 @@ jobs:
             | .iss="${{ secrets.APP_ID }}"
             ' | base64 | sed s/\+/-/ | sed -E s/=+$//
           )
-          sign=$(echo -n "$header.$payload" | openssl dgst -sha256 -binary -sign ./app.pem  | openssl enc -base64 | tr -d '\n=' | tr -- '+/' '-_')
+          sign=$(printf '%s' "$header.$payload" | openssl dgst -sha256 -binary -sign ./app.pem  | openssl enc -base64 | tr -d '\n=' | tr -- '+/' '-_')
           jwt="$header.$payload.$sign"
           token=$(gh api -X POST -H "Authorization: Bearer $jwt" /app/installations/36841442/access_tokens | jq -r .token)
           echo "token=$token" >> $GITHUB_OUTPUT
