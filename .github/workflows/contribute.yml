@@ -56,6 +56,7 @@ jobs:
         with:
           repository: yo-ga/Dash-User-Contributions
           persist-credentials: true
+          token: ${{ steps.setup_token.outputs.token }}
           fetch-depth: 0
 
       - run: |
