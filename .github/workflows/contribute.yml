@@ -72,6 +72,7 @@ jobs:
       - env:
           GH_TOKEN: ${{ steps.setup_token.outputs.token }}
         run: |
+          gh auth setup-git
           git config --global user.email "$(gh api /users/${{ github.repository_owner }} | jq -r .email)"
           git config --global user.name "$(gh api /users/${{ github.repository_owner }} | jq -r .name)"
           git add .
