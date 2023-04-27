@@ -29,7 +29,8 @@ jobs:
           )
           sign=$(printf '%s' "$header.$payload" | openssl dgst -sha256 -binary -sign ./app.pem  | openssl enc -base64 | tr -d '\n=' | tr -- '+/' '-_')
           jwt="$header.$payload.$sign"
-          token=$(gh api -X POST -H "Authorization: Bearer $jwt" /app/installations/36841442/access_tokens | jq -r .token)
+          install_id=$(gh api -X POST -H "Authorization: Bearer $jwt" /app/installations | jq -r .[0].id)
+          token=$(gh api -X POST -H "Authorization: Bearer $jwt" /app/installations/${install_id}/access_tokens | jq -r .token)
           echo "token=$token" >> $GITHUB_OUTPUT
 
       - name: Get release version
@@ -68,7 +69,13 @@ jobs:
           cp /tmp/AWS_CDK_Python.tgz ./docsets/AWS_CDK_Python/versions/${RELEASE_VERSION}
 
       - run: |
-          cat docsets/AWS_CDK_Python/docset.json | jq --indent 4 -M '.specific_versions += [{"version": "${RELEASE_VERSION/-/\/}", "archive": "versions/${RELEASE_VERSION}/AWS_CDK_Python.tgz"}] | .specific_versions |= (sort_by(.version) | reverse) | .version |= "${RELEASE_VERSION/-/\/}"' | tee docsets/AWS_CDK_Python/docset.json
+          cat docsets/AWS_CDK_Python/docset.json | jq --arg RELEASE_VERSION "${RELEASE_VERSION/-//}" --arg DIR "${RELEASE_VERSION}" --indent 4 -M \
+           '
+           .specific_versions += [{"version": "$RELEASE_VERSION", "archive": "versions/$DIR/AWS_CDK_Python.tgz"}]
+           | .specific_versions
+           |= ( sort_by(.version) | reverse )
+           | .version
+           |= "$RELEASE_VERSION"' | tee docsets/AWS_CDK_Python/docset.json
 
       - env:
           GH_TOKEN: ${{ steps.setup_token.outputs.token }}
@@ -83,8 +90,9 @@ jobs:
       - env:
           GH_TOKEN: ${{ steps.setup_token.outputs.token }}
         run: |
+          echo "- Document: AWS CDK Python\n- Latest version: ${RELEASE_VERSION}\n- Generated from: [${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python](https://github.com/${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python/)\n- Change log\n    - Release ${RELEASE_VERSION}" | \
           gh pr create --repo=${GITHUB_REPOSITORY_OWNER}/Dash-User-Contributions \
           --base=master \
           --head="${GITHUB_REPOSITORY_OWNER}:aws-cdk-python-${RELEASE_VERSION}" \
           --title="AWS-CDK-Python ${RELEASE_VERSION}" \
-          --body="- Document: AWS CDK Python\n- Latest version: ${RELEASE_VERSION}\n- Generated from: [${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python](https://github.com/${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python/)\n- Change log\n    - Release ${RELEASE_VERSION}"
+          --body -
