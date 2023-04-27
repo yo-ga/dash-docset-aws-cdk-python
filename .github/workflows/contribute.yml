@@ -90,4 +90,4 @@ jobs:
           git push origin aws-cdk-python-${RELEASE_VERSION} --force
 
       - run: |
-          echo -e "- Document: AWS CDK Python\n- Latest version: ${RELEASE_VERSION}\n- Generated from: [${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python](https://github.com/${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python/)\n- Change log\n    - Release ${RELEASE_VERSION}" > msg
+          echo -e "- Document: AWS CDK Python\n- Latest version: ${RELEASE_VERSION}\n- Generated from: [${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python](https://github.com/${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python/)\n- Change log\n    - Release ${RELEASE_VERSION}"
