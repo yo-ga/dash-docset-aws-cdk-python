@@ -9,16 +9,27 @@ on:
 jobs:
   push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - name: Setup SSH key
+      - name: Setup token
+        id: setup_token
         run: |
-          echo "${{ secrets.SSH_KEY }}" > ./ssh_key
-          eval "$(ssh-agent -s)"
-          chmod 600 ./ssh_key
-          ssh-add ./ssh_key
-          gh auth login -p ssh -h github.com
+          echo "${{ secrets.APP_PEM }}" > ./app.pem
+          header=$(echo -n '{"alg":"RS256","typ":"JWT"}' | base64 | sed s/\+/-/ | sed -E s/=+$//)
+
+          payload=$(
+            echo "{}" | jq --arg time_str "$(date +%s)" \
+            '
+            ($time_str | tonumber) as $time_num
+            | .iat=$time_num
+            | .exp=($time_num + 600)
+            | .iss="${{ secrets.APP_ID }}"
+            ' | base64 | sed s/\+/-/ | sed -E s/=+$//
+          )
+          sign=$(echo -n "$header.$payload" | openssl dgst -sha256 -binary -sign ./app.pem  | openssl enc -base64 | tr -d '\n=' | tr -- '+/' '-_')
+          jwt="$header.$payload.$sign"
+          token=$(gh api -X POST -H "Authorization: Bearer $jwt" /app/installations/36841442/access_tokens | jq -r .token)
+          echo "token=$token" >> $GITHUB_OUTPUT
+
       - name: Get release version
         run: |
           version=$(gh release view --repo $GITHUB_REPOSITORY --json tagName | jq -r .tagName)
@@ -29,9 +40,11 @@ jobs:
         run: |
           gh release download ${RELEASE_VERSION} -R $GITHUB_REPOSITORY -D /tmp -p AWS_CDK_Python.tgz
 
-      # - name: Sync repo
-      #   run: |
-      #     gh repo sync yo-ga/Dash-User-Contributions --source Kapari/Dash-User-Contributions -b master
+      - name: Sync repo
+        env:
+          GH_TOKEN: ${{ steps.setup_token.outputs.token }}
+        run: |
+          gh repo sync yo-ga/Dash-User-Contributions --source Kapari/Dash-User-Contributions -b master
       
       - uses: actions/checkout@v3
         with:
@@ -50,15 +63,18 @@ jobs:
       - run: |
           cat docsets/AWS_CDK_Python/docset.json | jq --indent 4 -M '.specific_versions += [{"version": "${RELEASE_VERSION/-/\/}", "archive": "versions/${RELEASE_VERSION}/AWS_CDK_Python.tgz"}] | .specific_versions |= (sort_by(.version) | reverse) | .version |= "${RELEASE_VERSION/-/\/}"' > docsets/AWS_CDK_Python/docset.json
 
-      - run: |
-          gh auth setup-git
-          git config --global user.email "$(gh api /user/public_emails | jq -r .[0].email)"
-          git config --global user.name "$(gh api /user | jq -r .name)"
+      - env:
+          GH_TOKEN: ${{ steps.setup_token.outputs.token }}
+        run: |
+          git config --global user.email "$(gh api /users/${{ github.repository_owner }} | jq -r .email)"
+          git config --global user.name "$(gh api /users/${{ github.repository_owner }} | jq -r .name)"
           git add .
           git commit -m "AWS-CDK-Python: ${RELEASE_VERSION}"
           git push origin aws-cdk-python-${RELEASE_VERSION}
 
-      - run: |
+      - env:
+          GH_TOKEN: ${{ steps.setup_token.outputs.token }}
+        run: |
           gh pr create --repo=${GITHUB_REPOSITORY_OWNER}/Dash-User-Contributions \
           --base=master \
           --head="${GITHUB_REPOSITORY_OWNER}:aws-cdk-python-${RELEASE_VERSION}" \
