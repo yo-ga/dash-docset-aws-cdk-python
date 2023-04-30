@@ -95,10 +95,10 @@ jobs:
       - env:
           GH_TOKEN: ${{ secrets.PAT }}
         run: |
-          echo -e "- Document: AWS CDK Python\n- Latest version: ${RELEASE_VERSION}\n- Generated from: [${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python](https://github.com/${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python/)\n- Change log\n    - Release ${RELEASE_VERSION}"
+          echo -e "- Document: AWS CDK Python\n- Latest version: ${RELEASE_VERSION}\n- Generated from: [${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python](https://github.com/${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python/)\n- Change log\n    - Release ${RELEASE_VERSION}" > ./msg
 
-          gh pr create --repo=Kapeli/Dash-User-Contributions \
+          gh pr create --repo=yo-ga/Dash-User-Contributions \
           --base=master \
           --head="${GITHUB_OWNER}:aws-cdk-python-${RELEASE_VERSION}" \
           --title="AWS-CDK-Python ${RELEASE_VERSION}" \
-          --body="- Document: AWS CDK Python\n- Latest version: ${RELEASE_VERSION}\n- Generated from: [yo-ga/dash-docset-aws-cdk-python](https://github.com/yo-ga/dash-docset-aws-cdk-python/)\n- Change log\n    - Release ${RELEASE_VERSION}"
+          --body-file=./msg
