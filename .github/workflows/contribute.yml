@@ -101,4 +101,4 @@ jobs:
           --base=master \
           --head="${GITHUB_OWNER}:aws-cdk-python-${RELEASE_VERSION}" \
           --title="AWS-CDK-Python ${RELEASE_VERSION}" \
-          --body-file="./msg"
+          # --body-file="./msg"
