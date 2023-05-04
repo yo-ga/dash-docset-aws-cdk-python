@@ -99,6 +99,6 @@ jobs:
 
           gh pr create --repo=yo-ga/Dash-User-Contributions \
           --base=master \
-          --head="${GITHUB_OWNER}:aws-cdk-python-${RELEASE_VERSION}" \
+          --head="${{ github.repository_owner }}:aws-cdk-python-${RELEASE_VERSION}" \
           --title="AWS-CDK-Python ${RELEASE_VERSION}" \
           --body-file="./msg"
