@@ -92,5 +92,13 @@ jobs:
           git commit -m "AWS-CDK-Python: ${RELEASE_VERSION}"
           git push origin aws-cdk-python-${RELEASE_VERSION} --force
 
-      - run: |
-          echo -e "- Document: AWS CDK Python\n- Latest version: ${RELEASE_VERSION}\n- Generated from: [${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python](https://github.com/${GITHUB_REPOSITORY_OWNER}/dash-docset-aws-cdk-python/)\n- Change log\n    - Release ${RELEASE_VERSION}"
+      - env:
+          GH_TOKEN: ${{ secrets.PAT }}
+        run: |
+          echo -e "- Document: AWS CDK Python\n- Latest version: ${RELEASE_VERSION}\n- Generated from: [${{ github.repository }}](https://github.com/${{ github.repository }})\n- Change log\n    - Release ${RELEASE_VERSION}" > ./msg
+
+          gh pr create --repo=Kapeli/Dash-User-Contributions \
+          --base=master \
+          --head="${{ github.repository_owner }}:aws-cdk-python-${RELEASE_VERSION}" \
+          --title="AWS-CDK-Python ${RELEASE_VERSION}" \
+          --body-file="./msg"
