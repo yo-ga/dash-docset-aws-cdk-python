@@ -52,7 +52,7 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.setup_token.outputs.token }}
         run: |
-          gh repo sync yo-ga/Dash-User-Contributions --source Kapari/Dash-User-Contributions -b master
+          gh repo sync yo-ga/Dash-User-Contributions --source Kapeli/Dash-User-Contributions -b master
       
       - uses: actions/checkout@v3
         with:
